@@ -153,6 +153,22 @@ public:
                                             _1,
                                             _2,
                                             ptr_imu_->genExitCal()));
+                srv_trg_enable_gyro_cali_ = pnh_.advertiseService<std_srvs::TriggerRequest, std_srvs::TriggerResponse>(
+                                        "trigger_enable_gyro_auto_calibration",
+                                        boost::bind(
+                                            &WitImuDriver::cbSrvTrgWriteCommand,
+                                            this,
+                                            _1,
+                                            _2,
+                                            ptr_imu_->enableAutoGyroCali()));
+                srv_trg_disable_gyro_cali_ = pnh_.advertiseService<std_srvs::TriggerRequest, std_srvs::TriggerResponse>(
+                                        "trigger_disable_gyro_auto_calibration",
+                                        boost::bind(
+                                            &WitImuDriver::cbSrvTrgWriteCommand,
+                                            this,
+                                            _1,
+                                            _2,
+                                            ptr_imu_->diableAutoGyroCali()));
             }
             break;
 
@@ -186,6 +202,8 @@ private:
     ros::ServiceServer srv_trg_acc_cal_;
     ros::ServiceServer srv_trg_mag_cal_;
     ros::ServiceServer srv_trg_exit_cal_;
+    ros::ServiceServer srv_trg_enable_gyro_cali_;
+    ros::ServiceServer srv_trg_disable_gyro_cali_;
     ros::Timer wdg_;
     ros::Duration wdg_timeout_;
     std::string frame_id_;

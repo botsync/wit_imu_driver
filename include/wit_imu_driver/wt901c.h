@@ -29,6 +29,8 @@ public:
     virtual std::vector<uint8_t> genAccCal() const;
     virtual std::vector<uint8_t> genMagCal() const;
     virtual std::vector<uint8_t> genExitCal() const;
+    virtual std::vector<uint8_t> enableAutoGyroCali() const;
+    virtual std::vector<uint8_t> diableAutoGyroCali() const;
 private:
     sensor_msgs::Imu work_imu_;
     sensor_msgs::Temperature work_temp_;

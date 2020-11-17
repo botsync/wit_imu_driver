@@ -120,6 +120,16 @@ std::vector<uint8_t> Wt901c::genYawClr() const
     return std::vector<uint8_t>{0xFF, 0xAA, 0x01, 0x04, 0x00};
 }
 
+std::vector<uint8_t> Wt901c::enableAutoGyroCali() const
+{
+    return std::vector<uint8_t>{0xFF, 0xAA, 0x63, 0x00, 0x00};
+}
+
+std::vector<uint8_t> Wt901c::diableAutoGyroCali() const
+{
+    return std::vector<uint8_t>{0xFF, 0xAA, 0x63, 0x01, 0x00};
+}
+
 std::vector<uint8_t> Wt901c::genHightClr() const
 {
     return std::vector<uint8_t>{0xFF, 0xAA, 0x01, 0x03, 0x00};

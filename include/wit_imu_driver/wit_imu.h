@@ -90,6 +90,8 @@ public:
     virtual std::vector<uint8_t> genAccCal() const = 0;
     virtual std::vector<uint8_t> genMagCal() const = 0;
     virtual std::vector<uint8_t> genExitCal() const = 0;
+    virtual std::vector<uint8_t> enableAutoGyroCali() const = 0;
+    virtual std::vector<uint8_t> diableAutoGyroCali() const = 0;
 protected:
     const double co_gravity_;
     const size_t msg_buf_max_;
