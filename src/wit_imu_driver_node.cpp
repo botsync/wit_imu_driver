@@ -33,6 +33,8 @@ namespace ba = boost::asio;
 class WitImuDriver
 {
 public:
+    bool first_launch = true;
+
     WitImuDriver()
     : nh_()
     , pnh_("~")
@@ -52,6 +54,8 @@ public:
         int baud;
         pnh_.param<std::string>("device", dev, "/dev/ttyUSB0");
         pnh_.param<int>("baud", baud, 9600);
+
+        ptr_imu_ = boost::make_shared<Wt901c>(Wt901c(co_gravity_));
 
         boost::system::error_code ec;
         port_.open(dev, ec);
@@ -107,7 +111,7 @@ public:
         ioctl(fd, TIOCGSERIAL, &port_info);
         port_info.flags |= ASYNC_LOW_LATENCY;
         ioctl(fd, TIOCSSERIAL, &port_info);
-
+        
         return true;
     }
 
@@ -169,6 +173,30 @@ public:
                                             _1,
                                             _2,
                                             ptr_imu_->diableAutoGyroCali()));
+                if(first_launch){
+                    bool ret = sendBytes(ptr_imu_->enableAutoGyroCali());
+                    if (ret)
+                    {
+                        ROS_INFO("Successfully ENABLED Gyro Auto-calibration");
+                    }
+                    else
+                    {
+                        ROS_ERROR("Failed to ENABLED Gyro Auto-calibration");
+                    }
+
+                    sleep(10);
+
+                    ret = sendBytes(ptr_imu_->diableAutoGyroCali());
+                    if (ret)
+                    {
+                        ROS_INFO("Successfully DISABLED Gyro Auto-calibration");
+                    }
+                    else
+                    {
+                        ROS_ERROR("Failed ENABLED Gyro Auto-calibration");
+                    }
+                    first_launch = false;
+                }
             }
             break;
 
@@ -350,6 +378,7 @@ int main(int argc, char** argv)
 {
     ros::init(argc, argv, "wit_imu_driver");
     ROS_INFO("Start wit_imu_driver");
+    
 
     wit_imu_driver::WitImuDriver imu;
     if (!imu.open())
