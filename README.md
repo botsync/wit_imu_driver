@@ -10,6 +10,12 @@ Unofficial ROS driver for WIT Motion's IMU.
 
 WIP to add other device.
 
+# Featurues
+
+- Auto calibrate IMU within the first 10 seconds of launch 
+- Automatically calibrate IMU when there is no cmd_vel for 60 seconds
+  - Prevent IMU drift while stationary
+
 # parameters
 
 - ```gravity```
@@ -31,7 +37,7 @@ WIP to add other device.
 
 ## subscribe
 
-None
+- ```cmd_vel```
 
 # TODO
 
