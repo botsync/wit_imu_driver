@@ -12,6 +12,7 @@
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/MagneticField.h>
 #include <sensor_msgs/Temperature.h>
+#include <geometry_msgs/Twist.h>
 
 namespace wit_imu_driver
 {
@@ -92,6 +93,9 @@ public:
     virtual std::vector<uint8_t> genExitCal() const = 0;
     virtual std::vector<uint8_t> enableAutoGyroCali() const = 0;
     virtual std::vector<uint8_t> diableAutoGyroCali() const = 0;
+
+    // void WitImuDriver::cmd_vel_callback(const geometry_msgs::Twist& cmd_vel_msg);
+    
 protected:
     const double co_gravity_;
     const size_t msg_buf_max_;
@@ -100,7 +104,7 @@ protected:
     std::queue<sensor_msgs::Temperature> temp_buf_;
     std::queue<sensor_msgs::MagneticField> mag_buf_;
     
-    void cmd_vel_callback(const geometry_msgs::Twist& cmd_vel_msg);
+    
 
     static int bytes2int(const uint8_t h, const uint8_t l)
     {

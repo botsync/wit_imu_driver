@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_srvs
   tf2
+  geometry_msgs
 )
 
 find_package(Boost REQUIRED COMPONENTS system)
