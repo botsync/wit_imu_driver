@@ -294,7 +294,7 @@ private:
         if (!ec)
         {
             ptr_imu_->pushBytes(rx_buf_, size, ros::Time::now());
-            // cmd_vel_check();
+            cmd_vel_check();
             while (ptr_imu_->sizeImuData() != 0)
             {
                 sensor_msgs::Imu msg;
@@ -388,14 +388,15 @@ private:
     }
     
     void cmd_vel_callback(const geometry_msgs::Twist& cmd_vel_msg){
+        // ROS_ERROR("THERE IS cmd_vel!!!");
         current_time = ros::Time::now();
-        if(cmd_vel_input){
-            ROS_ERROR("THERE IS cmd_vel!!!");
-            prev_time = current_time;
-        }
+        prev_time = current_time;
     }
     
     void cmd_vel_check(){
+        current_time = ros::Time::now();
+        // ROS_ERROR("Time Diff: %d", current_time - prev_time);
+        // ROS_ERROR("enabled_auto_cali_status: %d \n", enabled_auto_cali_status);
         // Enable gyro auto calibration when no cmd_vel for more than 1 minute
         if(current_time - prev_time > ros::Duration(60) && !enabled_auto_cali_status){
             bool ret = sendBytes(ptr_imu_->enableAutoGyroCali());
