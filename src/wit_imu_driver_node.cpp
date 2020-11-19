@@ -17,6 +17,7 @@
 #include <sensor_msgs/MagneticField.h>
 #include <sensor_msgs/Temperature.h>
 #include <std_srvs/Trigger.h>
+#include <geometry_msgs/Twist Message.h>
 
 #include <boost/asio.hpp>
 #include <boost/asio/buffer.hpp>
@@ -112,6 +113,8 @@ public:
         port_info.flags |= ASYNC_LOW_LATENCY;
         ioctl(fd, TIOCSSERIAL, &port_info);
         
+        nh_.subscribe(cmd_vel_subcriber);
+        
         return true;
     }
 
@@ -121,6 +124,7 @@ public:
         {
             case WitImu::PRODUCT::WT901C:
             {
+                current_time = ros::Time::now();
                 pub_imu_ = nh_.advertise<sensor_msgs::Imu>("data_raw", 10);
                 pub_temp_ = nh_.advertise<sensor_msgs::Temperature>("temperature", 10);
                 pub_mag_ = nh_.advertise<sensor_msgs::MagneticField>("mag", 10);
@@ -197,6 +201,34 @@ public:
                     }
                     first_launch = false;
                 }
+                
+                // check for cmd_vel input
+                if(cmd_vel_input){
+                  // Enable gyro auto calibration when no cmd_vel for more than 1 minute
+                  if(current_time - prev_time > ros::Duration(60)){
+                    bool ret = sendBytes(ptr_imu_->enableAutoGyroCali());
+                    if (ret)
+                    {
+                        ROS_INFO("Successfully ENABLED Gyro Auto-calibration");
+                        enabled_auto_cali_status = true;
+                    }
+                    else
+                    {
+                        ROS_ERROR("Failed to ENABLED Gyro Auto-calibration");
+                    }
+                  } else if (enabled_auto_cali_status) {
+                    bool ret = sendBytes(ptr_imu_->diableAutoGyroCali());
+                    if (ret)
+                    {
+                        ROS_INFO("Successfully DISABLED Gyro Auto-calibration");
+                        enabled_auto_cali_status = false;
+                    }
+                    else
+                    {
+                        ROS_ERROR("Failed ENABLED Gyro Auto-calibration");
+                    }
+                  }
+                }
             }
             break;
 
@@ -228,6 +260,7 @@ private:
     ros::ServiceServer srv_trg_yaw_clr_;
     ros::ServiceServer srv_trg_height_clr_;
     ros::ServiceServer srv_trg_acc_cal_;
+    ros::ServiceServer srv_trg_acc_cal_;
     ros::ServiceServer srv_trg_mag_cal_;
     ros::ServiceServer srv_trg_exit_cal_;
     ros::ServiceServer srv_trg_enable_gyro_cali_;
@@ -235,6 +268,8 @@ private:
     ros::Timer wdg_;
     ros::Duration wdg_timeout_;
     std::string frame_id_;
+    
+    ros::Subscriber<geometry_msgs::Twist> cmd_vel_subcriber("cmd_vel", cmd_vel_callback);
 
     ba::io_service port_io_;
     ba::serial_port port_;
@@ -245,6 +280,11 @@ private:
     std::vector<uint8_t> rx_buf_;
 
     boost::shared_ptr<WitImu> ptr_imu_;
+    
+    bool cmd_vel_input = false;
+    bool enabled_auto_cali_status = false;
+    ros::Time prev_time = ros::Time::now();
+    ros::Time current_time = ros::Time::now();
 
     void close()
     {
@@ -370,6 +410,10 @@ private:
             return false;
         }
         return true;
+    }
+    
+    void cmd_vel_callback(const geometry_msgs::Twist& cmd_vel_msg){
+      cmd_vel_input = true;
     }
 };
 }   // namespace wit_imu_driver
