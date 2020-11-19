@@ -99,6 +99,8 @@ protected:
     std::queue<sensor_msgs::Imu> imu_buf_;
     std::queue<sensor_msgs::Temperature> temp_buf_;
     std::queue<sensor_msgs::MagneticField> mag_buf_;
+    
+    void cmd_vel_callback(const geometry_msgs::Twist& cmd_vel_msg);
 
     static int bytes2int(const uint8_t h, const uint8_t l)
     {
