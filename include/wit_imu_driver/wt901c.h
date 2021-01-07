@@ -10,6 +10,7 @@
 
 #include <queue>
 #include <vector>
+#include <numeric>
 
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/MagneticField.h>
